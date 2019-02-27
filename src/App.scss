@@ -1,0 +1,59 @@
+%center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+$head-font-size : 7vmin;
+$normal-font-size : 3vmin;
+$small-font-size: 2vmin;
+
+$half-size: 50vmin;
+$main-el-size: $half-size * 0.8;
+
+.App {
+  text-align: center;
+  height: 100vh;
+  @extend %center;
+}
+
+.edit-component {
+  height: 70vh;
+  width: 50vw;
+  border: 1px solid black;
+  box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+
+.main-circle {
+  width: $main-el-size;
+  height: $main-el-size;
+  margin: $half-size * 0.1;
+  margin-left: calc((50vw - 40vmin)/2);
+  
+  border: 1px solid black;
+  border-radius: 100%;
+  
+  // for text
+  @extend %center;
+}
+
+.circle-inner-text {
+  font-size: $normal-font-size;
+}
+
+.main-title {
+  font-size: $head-font-size;
+}
+
+
+label {
+  font-size: $small-font-size;
+}
+
+input {
+  width: $main-el-size;
+  height: $main-el-size*0.15;
+}
