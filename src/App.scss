@@ -4,9 +4,17 @@
   align-items: center;
 }
 
+%border-box {
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+
 $head-font-size : 7vmin;
 $normal-font-size : 3vmin;
 $small-font-size: 2vmin;
+$head-font : 'Lobster', cursive;
+$normal-font: 'Abel', sans-serif;
 
 $half-size: 50vmin;
 $main-el-size: $half-size * 0.8;
@@ -21,9 +29,7 @@ $main-el-size: $half-size * 0.8;
   height: 70vh;
   width: 50vw;
   border: 1px solid black;
-  box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
+  @extend %border-box;
 }
 
 
@@ -33,19 +39,30 @@ $main-el-size: $half-size * 0.8;
   margin: $half-size * 0.1;
   margin-left: calc((50vw - 40vmin)/2);
   
-  border: 1px solid black;
+  // border: $small-font-size solid black;
   border-radius: 100%;
-  
+  background: linear-gradient(to right, #b861c6 0%,#ffc7c7 100%);
+
+  @extend %border-box;
   // for text
   @extend %center;
+  .inner-circle {
+    width: $main-el-size * 0.85;
+    height: $main-el-size * 0.85;
+    background: white;
+    border-radius: 100%;
+    @extend %center;
+  }
 }
 
 .circle-inner-text {
   font-size: $normal-font-size;
+  font-family: $normal-font;
 }
 
 .main-title {
   font-size: $head-font-size;
+  font-family: $head-font;
 }
 
 
@@ -57,3 +74,5 @@ input {
   width: $main-el-size;
   height: $main-el-size*0.15;
 }
+
+

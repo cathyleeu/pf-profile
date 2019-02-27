@@ -18,7 +18,9 @@ class App extends Component {
         <div className="edit-component">
           <p className="main-title">Edit Your Profile</p>
           <div className="main-circle" onClick={this.isHandleClick}>
-            <p className="circle-inner-text">Edit</p>          
+            <div className="inner-circle">
+              <p className="circle-inner-text">Edit</p>          
+            </div>
           </div>
           <label>
             name
