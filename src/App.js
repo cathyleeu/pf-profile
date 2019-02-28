@@ -12,6 +12,11 @@ const InnerCircleText = (props) => {
 }
 
 const InnerCircleEl = (props) => {
+  // inner-circle -> inner-select (box)
+  let classStyle = {
+    "props" : {
+    }
+  }
   return (
     <div className="inner-circle-border">
       <div className="inner-circle">
@@ -58,6 +63,8 @@ class App extends Component {
     
   }
   isDispatchStatus = (state) => {
+    // edit -> photo
+    // photo -> modal choose (사각으로 변신) 
     console.log(state);
   }
   render() {
