@@ -10,11 +10,29 @@
   -webkit-box-sizing: border-box;
 }
 
-$head-font-size : 7vmin;
-$normal-font-size : 3vmin;
-$small-font-size: 2vmin;
+%slide-in {
+  animation: slide-up 1s ease-out forwards;
+}
+%slide-out {
+  animation: slide-down 1s ease-out forwards;
+}
+
+%fade-in {
+  opacity: 1 !important;
+  transition: opacity 1s;
+}
+
+%fade-out {
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+$head-font-size : 7.7vmin;
+$normal-font-size : 3.5vmin;
+$small-font-size: 2.2vmin;
 $head-font : 'Lobster', cursive;
 $normal-font: 'Abel', sans-serif;
+$inside-el-margin-left : calc((50vw - 40vmin)/2);
 
 $half-size: 50vmin;
 $main-el-size: $half-size * 0.8;
@@ -22,57 +40,143 @@ $main-el-size: $half-size * 0.8;
 .App {
   text-align: center;
   height: 100vh;
+
+  background-size: auto 100vh;
+  object-fit: cover;
+  background-image: url(./assets/main-1.jpg);
+  
   @extend %center;
 }
 
 .edit-component {
   height: 70vh;
   width: 50vw;
-  border: 1px solid black;
+  // border: 1px solid black;
   @extend %border-box;
 }
 
-
-.main-circle {
+.image-cont {
   width: $main-el-size;
   height: $main-el-size;
   margin: $half-size * 0.1;
-  margin-left: calc((50vw - 40vmin)/2);
-  
-  // border: $small-font-size solid black;
+  margin-left: $inside-el-margin-left;
   border-radius: 100%;
-  background: linear-gradient(to right, #b861c6 0%,#ffc7c7 100%);
 
+  position: relative;
   @extend %border-box;
-  // for text
-  @extend %center;
-  .inner-circle {
-    width: $main-el-size * 0.85;
-    height: $main-el-size * 0.85;
-    background: white;
-    border-radius: 100%;
-    @extend %center;
+  // @extend %center;
+
+  .inner-circle-border {
+    top: 0;
+    left: 0;
+    position: absolute;
+    background: linear-gradient(to right, #b861c6 0%,#ffc7c7 100%);
+    border-radius: 100%;    
+    
+    width: $main-el-size;
+    height: $main-el-size;
+    animation : rotate 3s linear;
+    animation-iteration-count: infinite;
+
+    .inner-circle {
+      position: absolute;
+      top: $main-el-size * 0.075;
+      left: $main-el-size * 0.075;
+      width: $main-el-size * 0.85;
+      height: $main-el-size * 0.85;
+      background-color: rgba($color: #ffffff, $alpha: 0.8);
+      border-radius: 100%;
+      
+    }
+  }
+  .circle-inner-text {
+    position: relative;
+
+    top: $main-el-size * 0.5 - ($normal-font-size/2);
+    
+    text-align: center;
+    font-size: $normal-font-size;
+    font-family: $normal-font;
+    user-select: none;
+    font-weight: 700;
   }
 }
 
-.circle-inner-text {
-  font-size: $normal-font-size;
-  font-family: $normal-font;
-}
 
-.main-title {
+
+.title-cont {
   font-size: $head-font-size;
   font-family: $head-font;
+  color: rgba($color: #ffffff, $alpha: 0.8);
 }
 
-
-label {
-  font-size: $small-font-size;
-}
-
-input {
+.input-cont {
   width: $main-el-size;
-  height: $main-el-size*0.15;
+  margin-left: $inside-el-margin-left;
+  opacity: 0;
+  p {
+    font-size: $small-font-size;
+    text-align: left;
+    color: #ffffff;
+  }
+  input {
+    width: 100%;
+    height: $main-el-size*0.18;
+    @extend %border-box;
+  }
+
 }
+
+.edit-start {
+  @extend %slide-in;
+  
+}
+.edit-end {
+  @extend %slide-out;
+}
+
+.fade-out {
+  @extend %fade-out;
+}
+
+.fade-in {
+  @extend %fade-in; 
+}
+
+
+@mixin transform($property) {
+  transform: $property;
+    -ms-transform: $property; 
+    -webkit-transform: $property; 
+}
+
+@keyframes rotate {
+  0% {
+  }
+  100% {
+    @include transform(rotate(360deg));
+  }
+}
+
+@keyframes slide-up {
+  from {
+    @include transform(translateY(0));
+  }
+  to {
+    @include transform(translateY(-$head-font-size));
+  }
+}
+
+
+@keyframes slide-down {
+  from {
+    @include transform(translateY(-$head-font-size));
+  }
+  to {
+    @include transform(translateY(0));
+  }
+}
+
+
 
 
