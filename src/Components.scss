@@ -1,0 +1,21 @@
+@import "base"
+
+.modal-cont {
+    height: 100vh;
+    width: 100vw;
+    background-color: rgba($color: #000000, $alpha: 0.4);
+    position: absolute;
+    z-index: 100;
+    
+    @extend %center;
+  
+    .modal-select-box {
+      width: 40vw;
+      height: 60vh;
+      background-color: #ffffff;
+      border-radius: 2%;
+      // 생각해보기 ㅈㄴ 구림 
+      animation: slide-down 1s ease-in-out forwards;
+    }
+  
+  }
