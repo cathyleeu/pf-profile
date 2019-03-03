@@ -1,13 +1,24 @@
 import React, { Component } from 'react';
+// import ReactDOM from 'react-dom';
 import './App.scss';
 
 
 const InnerCircleText = (props) => {
-  return (
-    <p className="circle-inner-text">
-        {props.text}
-    </p>
-  )
+  if(props.imageUrl) {
+    console.log("I got imageUrl");
+    return (
+      <img 
+        className="inner-image" 
+        src={props.imageUrl} 
+        alt="userImage"/>
+    )
+  } else {
+    return (
+      <p className="circle-inner-text">
+          {props.text}
+      </p>
+    )
+  }
 }
 
 const InnerCircleEl = (props) => {
@@ -25,6 +36,7 @@ const InnerCircleEl = (props) => {
       </div>
     </div>
   )
+  
 }
 
 // class InnerCircleEl extends Component {
@@ -77,7 +89,21 @@ const SelectButton = (props) => {
   )
 }
 
+
+// width 와 height 이 왜 있어야핟ㅇ...?
+let width = 320, height = 0, streaming = false;
+
 class App extends Component {
+  defaultState = {
+    file: '',
+    imagePreviewUrl: '',
+    imageSelected: '',
+    modalVisible: false,
+    cameraVisible: false,
+    canvas: 'none',
+    takeAfter: 'none',
+    takeBefore: '',
+  }
   constructor() {
     super()
     this.state = {
@@ -86,7 +112,8 @@ class App extends Component {
       innerStatus : "default",
       modal: false,
       selectType : "default",
-      canvas : "none"
+      canvas : "none",
+      video: ""
     }
     this.editStatus = {
       true : {
@@ -127,6 +154,9 @@ class App extends Component {
       }
     }
   }
+  componentWillMount(){
+    this.setState({...this.defaultState})
+  }
   isHandleEdit = (e) => {
     e.preventDefault();
     console.log("clicked")
@@ -141,6 +171,7 @@ class App extends Component {
       modal : !this.state.modal,
       selectType : "default"
     })
+    
   }
   isHandleInnerStatus = (state) => {
     this.setState({
@@ -151,19 +182,17 @@ class App extends Component {
     this.setState({
       selectType: type
     })
+    if(type === "camera") {
+      this.handleStartCamera()
+      return;
+    }
+    if(type === "cameraCancle") {
+      this.handleCloseCamera(this.state.video)
+      return
+    }
     
     console.log(`is selected ${type}`);
   }
-  // isRenderCamera = () => {
-    
-  //   console.log("isRenderCamera");
-
-  // }
-  // isRenderFileDrop = () => {
-  //   // select box choose -> file drop -> crop image
-  //   console.log("isRenderFileDrop");
-    
-  // }
   isHandleChange = (e) => {
     e.preventDefault();
     console.log(e.target.value);
@@ -172,36 +201,144 @@ class App extends Component {
     })
   }
 
-  // handleStartCamera = () => {
-  //   let video = this.refs.video, canvas = this.refs.canvas, startbutton = this.refs.startbutton
-  //   navigator.getMedia = ( navigator.getUserMedia ||
-  //                          navigator.webkitGetUserMedia ||
-  //                          navigator.mozGetUserMedia ||
-  //                          navigator.msGetUserMedia);
-  //  navigator.getMedia(
-  //    {
-  //      video: true,
-  //      audio: false
-  //    },
-  //    function(stream) {
-  //      if (navigator.mozGetUserMedia) {
-  //        video.mozSrcObject = stream;
-  //      } else {
-  //        var vendorURL = window.URL || window.webkitURL;
-  //        video.src = vendorURL.createObjectURL(stream);
-  //      }
-  //      video.play();
-  //     //  console.log("method",video.play());
-  //    },
-  //    function(err) {
-  //      console.log("An error occured! " + err);
-  //    }
-  //  );
-  //  video.addEventListener('canplay', () => this.handleCanPlay(video), false)
-  //  startbutton.addEventListener('click', () => this.handleTakePicture(canvas, video) , false);
+  handleStartCamera = () => {
+    console.log("handleStartCamera");
+    
+    let video = this.refs.video, 
+        canvas = this.refs.canvas, 
+        startbutton = this.refs.startbutton
 
-  // }
 
+    navigator.getMedia = ( navigator.getUserMedia ||
+                           navigator.webkitGetUserMedia ||
+                           navigator.mozGetUserMedia ||
+                           navigator.msGetUserMedia);
+
+    navigator.getMedia(
+     {
+       video: true,
+       audio: false
+     },
+     function(stream) {
+       if (navigator.mozGetUserMedia) {
+         // moz stream
+         video.mozSrcObject = stream;
+
+       } else {
+
+         // deprecated
+         //  var vendorURL = window.URL || window.webkitURL;
+         //  video.src = vendorURL.createObjectURL(stream);
+        
+         video.srcObject=stream;
+       }
+
+       video.play();
+     },
+     function(err) {
+       console.log("An error occured! " + err);
+     }
+   );
+
+   video.addEventListener('canplay', () => this.handleCanPlay(video), false)
+   startbutton.addEventListener('click', () => this.handleTakePicture(canvas, video) , false);
+    this.setState({
+      video : video
+    })
+  }
+
+  handleTakePicture(canvas, video){
+
+    console.log("handleTakePicture");
+    
+    // let selectbutton = this.refs.selectbutton;
+
+    let context = canvas.getContext('2d'), data;
+
+    if (width && height) {
+      console.log(width, height);
+      
+      canvas.width = width;
+      canvas.height = height;
+      context.drawImage(video, 0, 0, width, height);
+
+      data = canvas.toDataURL('image/png');
+      console.log(data);
+      
+      
+    } else {
+      // this.handleClearPhoto(canvas)
+      console.log("handleClear");
+      
+    }
+    this.setState({
+      imagePreviewUrl: data,
+      canvas: '',
+      takeAfter: '',
+      takeBefore: 'none',
+      modal : false
+    })
+
+    // selectbutton.addEventListener('click', () => this.handleSetImage(data) , false)
+  
+    // camera 종료
+    this.handleCloseCamera(video);
+  }
+  handleCloseCamera = (video) => {
+    video.srcObject.getTracks().forEach(track => track.stop())
+  }
+  handleCanPlay = (video) => {
+    
+    console.log("handleCanPlay");
+    // We will scale the photo width to this
+    
+    if (!streaming) {
+      // 먼저 상태 확인을 하고 width 와 height을 췍
+      height = video.videoHeight / (video.videoWidth/width)
+      /*
+        video.videoHeight = 0
+        video.videoWidth = 0 둘다 영을 가지고,
+        height = 0/(0/320) => NaN 값을 가지게 됨
+      */
+      if (isNaN(height)) {
+        /*
+          때문에 NaN이라면? width = 320 에서 (4/3)을 나눈 값을 height으로 지정
+          그것이 240 값이 나오고 뷰에는 320*240의 video가 나오게 됨
+        */
+        height = width / (4/3)
+      }
+      // let videoEle = ReactDOM.findDOMNode(this.refs.video), 
+      //     canvasEle = ReactDOM.findDOMNode(this.refs.canvas);
+
+      // set width, height to video
+      // videoEle.setAttribute('width', width)
+      // videoEle.setAttribute('height', height)
+      // canvasEle.setAttribute('width', width)
+      // canvasEle.setAttribute('height', height)
+      streaming = true;
+    }
+
+  }
+  isHandleReadFile = (e) => {
+    console.log("isHandleReadFile");
+    let _self = this;
+    e.preventDefault();
+    
+    var file = e.target.files[0] || e.dataTransfer.files[0];
+    
+    if (file.type.includes("image")) {
+      var reader = new FileReader();
+      
+      reader.onload = function(evt) {
+        console.log(_self);
+        _self.setState({
+          imagePreviewUrl : evt.target.result
+        })
+      }
+      reader.readAsDataURL(file);
+      
+    }
+  }
   render() {
     let { slide, fadeTitle, fadeInput, innerText } = this.editStatus[this.state.edit];
     let { camera, library } = this.selectStatus[this.state.selectType];
@@ -221,14 +358,23 @@ class App extends Component {
               </div>
               <div className="photo-comp-btm">
                 <p onClick={() => this.isHandleSelectType('cameraCancle')}>Cancle</p>
-                <div 
-                  ref="takebutton"
-                  // style={{display: this.state.takeBefore}}
-                >
-                </div>
+                <div ref="startbutton"></div>
               </div>
             </div>
             <div className={`lib-comp ${library}`}>
+              <input 
+                ref="upload"
+                type="file"
+                name="files[]"
+                accept=".jpg, .jpeg, .png"
+                onChange={this.isHandleReadFile}
+                style={{display: 'none'}}
+              />
+              <div 
+                className="lib-readfile"
+                onClick={() => this.refs.upload.click()}>
+                  click to choose a file or drop it here
+              </div>
               <p onClick={() => this.isHandleSelectType('libCancle')}>Cancle</p>
             </div>
 
@@ -243,7 +389,10 @@ class App extends Component {
               isRenderModal={this.isRenderModal}
               innerStatus={this.state.innerStatus} 
             />
-            <InnerCircleText text={innerText}/>
+            <InnerCircleText 
+              imageUrl={this.state.imagePreviewUrl}
+              text={innerText}
+            />
           </div>
           <div 
             className={`input-cont ${slide} ${fadeInput}`}>
