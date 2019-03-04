@@ -92,7 +92,7 @@ const SelectButton = (props) => {
 
 // width 와 height 이 왜 있어야핟ㅇ...?
 let width = 320, height = 0, streaming = false;
-
+let cropNode;
 class App extends Component {
   defaultState = {
     file: '',
@@ -113,7 +113,8 @@ class App extends Component {
       modal: false,
       selectType : "default",
       canvas : "none",
-      video: ""
+      video: "",
+      cropNode: ""
     }
     this.editStatus = {
       true : {
@@ -321,25 +322,89 @@ class App extends Component {
   }
   isHandleReadFile = (e) => {
     console.log("isHandleReadFile");
-    let _self = this;
     e.preventDefault();
+
+    let _self = this;
+    let purpose = e.target.dataset.purpose || 'camera'
+    var files = e.target.files || e.dataTransfer.files;
     
-    var file = e.target.files[0] || e.dataTransfer.files[0];
-    
-    if (file.type.includes("image")) {
+    if(!files) {
+      return;
+    }
+    if (files[0].type.includes("image")) {
       var reader = new FileReader();
-      
-      reader.onload = function(evt) {
-        console.log(_self);
+
+      reader.onload = function(evt) {  
+        let fileUrl = evt.target.result;
+
         _self.setState({
-          imagePreviewUrl : evt.target.result
-        })
+          imagePreviewUrl : fileUrl
+        }) 
+
+        if(purpose === "library") {
+          _self.renderCropImage(e, fileUrl)
+        }
       }
-      reader.readAsDataURL(file);
-      
+      reader.readAsDataURL(files[0]);
+
+    }
+
+  }
+  isHandleDragEnter = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  isHandleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  isHandleDragLeave = (e) => {
+    // debugger
+    e.preventDefault();
+    e.stopPropagation();
+    // drag 가 떠났을때 style 
+  }
+  isHandleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    this.isHandleReadFile(e)
+  }
+  renderCropImage = (e, fileUrl) => {
+    if(fileUrl) {
+      let cropOpts = {
+        viewport: {
+          width: 180,
+          height: 180,
+          type: 'circle'
+        },
+        url: fileUrl,
+        // enforceBoundary: false
+        // mouseWheelZoom: false
+      }
+      cropNode = new window.Croppie(this.refs.lib, cropOpts);
     }
   }
-  render() {
+  isHandleCrop = (e) => {
+    e.preventDefault();
+    let _self = this;
+    cropNode.result({
+      type: 'rawcanvas',
+      circle: true,
+      // size: { width: 300, height: 300 },
+      format: 'png'
+    }).then(function (canvas) {
+      
+      _self.setState({
+        imagePreviewUrl: canvas.toDataURL(),
+        modal : false
+      })
+      cropNode.destroy();
+    })
+
+    
+
+  }
+   render() {
     let { slide, fadeTitle, fadeInput, innerText } = this.editStatus[this.state.edit];
     let { camera, library } = this.selectStatus[this.state.selectType];
     return (
@@ -367,13 +432,23 @@ class App extends Component {
                 type="file"
                 name="files[]"
                 accept=".jpg, .jpeg, .png"
+                data-purpose="library"
                 onChange={this.isHandleReadFile}
                 style={{display: 'none'}}
               />
               <div 
                 className="lib-readfile"
-                onClick={() => this.refs.upload.click()}>
+                data-purpose="library"
+                // file drop 받는 곳에서 발생하는 이벤트 
+                onDragEnter={this.isHandleDragEnter}
+                onDragOver={this.isHandleDragOver}
+                onDragLeave={this.isHandleDragLeave}
+                onDrop={this.isHandleDrop}
+                onClick={() => this.refs.upload.click()}
+                >
                   click to choose a file or drop it here
+                  <div ref="lib"></div>
+                  <button onClick={(e) => this.isHandleCrop(e)}>Crop</button>
               </div>
               <p onClick={() => this.isHandleSelectType('libCancle')}>Cancle</p>
             </div>
