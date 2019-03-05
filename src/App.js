@@ -39,31 +39,6 @@ const InnerCircleEl = (props) => {
   
 }
 
-// class InnerCircleEl extends Component {
-//   constructor(props) {
-//     super(props)
-//     this.innerStatus = {
-//       default : {
-//         handleClick : this.props.isHandleEdit
-//       },
-//       select : {
-//         handleClick : this.props.isRenderModal
-//       }
-//     } 
-//   }
-//   render() {
-//     let { handleClick } = this.innerStatus[this.props.innerStatus];
-//     return (
-//       <div className="inner-circle-border">
-//         <div className="inner-circle" onClick={handleClick}>
-//           { this.props.children }
-//         </div>
-//       </div>
-//     )
-//   }
-// }
-
-
 
 const Modal = (props) => {
   // modal open = props.isOpen
@@ -114,7 +89,9 @@ class App extends Component {
       selectType : "default",
       canvas : "none",
       video: "",
-      cropNode: ""
+      cropNode: "",
+      cropDisplay: "none",
+      dropDisplay: ""
     }
     this.editStatus = {
       true : {
@@ -324,6 +301,12 @@ class App extends Component {
     console.log("isHandleReadFile");
     e.preventDefault();
 
+    this.setState({
+      cropDisplay : "",
+      dropDisplay: "none"
+    })
+    this.refs.libBtm.style.marginTop = '2vmin';
+    
     let _self = this;
     let purpose = e.target.dataset.purpose || 'camera'
     var files = e.target.files || e.dataTransfer.files;
@@ -357,17 +340,33 @@ class App extends Component {
   isHandleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if(e.target.className === "lib-readfile") {
+      e.target.className = "lib-readfile drag-over"
+    }
   }
   isHandleDragLeave = (e) => {
     // debugger
     e.preventDefault();
     e.stopPropagation();
     // drag 가 떠났을때 style 
+
+    if(e.target.className === "lib-readfile drag-over") {
+      e.target.className = "lib-readfile"
+    }
+
   }
   isHandleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // this.setState({
+    //   cropDisplay : "",
+    //   dropDisplay: "none"
+    // })
+    
     this.isHandleReadFile(e)
+    
   }
   renderCropImage = (e, fileUrl) => {
     if(fileUrl) {
@@ -396,16 +395,16 @@ class App extends Component {
       
       _self.setState({
         imagePreviewUrl: canvas.toDataURL(),
-        modal : false
+        modal : false,
+        cropDisplay : 'none'
       })
       cropNode.destroy();
     })
 
-    
 
   }
    render() {
-    let { slide, fadeTitle, fadeInput, innerText } = this.editStatus[this.state.edit];
+    let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
     let { camera, library } = this.selectStatus[this.state.selectType];
     return (
       <div className="App">
@@ -437,22 +436,34 @@ class App extends Component {
                 style={{display: 'none'}}
               />
               <div 
-                className="lib-readfile"
+                className={"lib-readfile"}
                 data-purpose="library"
                 // file drop 받는 곳에서 발생하는 이벤트 
                 onDragEnter={this.isHandleDragEnter}
                 onDragOver={this.isHandleDragOver}
                 onDragLeave={this.isHandleDragLeave}
                 onDrop={this.isHandleDrop}
-                onClick={() => this.refs.upload.click()}
                 >
-                  click to choose a file or drop it here
-                  <div ref="lib"></div>
-                  <button onClick={(e) => this.isHandleCrop(e)}>Crop</button>
-              </div>
-              <p onClick={() => this.isHandleSelectType('libCancle')}>Cancle</p>
-            </div>
+                  <p style={{display: `${this.state.dropDisplay}`}}>Drag & Drop</p>
+                  <p 
+                    style={{display: `${this.state.dropDisplay}`}}
+                    className="file-open-btn"
+                    onClick={() => this.refs.upload.click()}> Click here to browse </p>
 
+                  <div ref="lib" style={{display: `${this.state.cropDisplay}`}}></div>
+                  
+              </div>
+              <div className="lib-btm" ref="libBtm">
+                <p 
+                className="cancle-btn"
+                onClick={() => this.isHandleSelectType('libCancle')}><span>Cancle</span></p>
+                <p 
+                  className="cancle-btn"
+                  style={{display: `${this.state.cropDisplay}`}}
+                  onClick={(e) => this.isHandleCrop(e)}>Crop</p>
+              </div>
+              
+            </div>
           </div>
 
         </Modal>
@@ -469,20 +480,6 @@ class App extends Component {
               text={innerText}
             />
           </div>
-          <div 
-            className={`input-cont ${slide} ${fadeInput}`}>
-            <p>name</p>
-            <input 
-              type="text" 
-              name="name"
-              placeholder="Write Your Name"
-              onChange={this.isHandleChange}
-              value={this.state.name}
-              />
-              <button>
-                Complete
-              </button>
-          </div>
         </div>
       </div>
     );
@@ -490,3 +487,19 @@ class App extends Component {
 }
 
 export default App;
+
+
+// <div 
+//             className={`input-cont ${slide} ${fadeInput}`}>
+//             <p>name</p>
+//             <input 
+//               type="text" 
+//               name="name"
+//               placeholder="Write Your Name"
+//               onChange={this.isHandleChange}
+//               value={this.state.name}
+//               />
+//               <button>
+//                 Complete
+//               </button>
+//           </div>
