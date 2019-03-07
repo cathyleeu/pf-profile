@@ -227,13 +227,10 @@ $main-el-size: $half-size * 0.8;
       @extend %center;
 
       border-bottom: 1px solid rgba($color: #000000, $alpha: 0.2);
-      p {
-        font-size: $normal-font-size;
-        color: rgba($color: #000000, $alpha: 0.7);
-        cursor: pointer;
-
-      }
-      &:last-child { 
+      font-size: $normal-font-size;
+      color: rgba($color: #000000, $alpha: 0.7);
+      cursor: pointer;
+      &:last-of-type { 
         border-bottom: none;
       }
     }
