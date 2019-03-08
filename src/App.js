@@ -12,22 +12,16 @@ class App extends Component {
     file: '',
     imagePreviewUrl: '',
     
-    innerStatus : "default",
-    selectType : "default",
-    
-    cropNode: "",
+    CameraIsOpen : "",
+    LibraryIsOpen: "",
 
-    canvasDisplay : "none",
+    innerStatus : "default",
 
     Camera: null,
     Library: null
   }
   constructor() {
     super()
-    this.takeRef = React.createRef();
-    this.renderCanvas = React.createRef();
-    this.renderVideo = React.createRef();
-    
     this.editStatus = {
       true : {
         slide : "edit-start",
@@ -42,71 +36,44 @@ class App extends Component {
         innerText : "Edit",
       }
     } 
-    // Fix 
-    this.selectStatus = {
-      default : {
-        camera : "",
-        library: "",
-      },
-      camera : {
-        camera: "open",
-        library: ""
-      },
-      library : {
-        camera: "",
-        library: "open"
-      },
-      cameraCancle : {
-        camera: "close",
-        library: ""
-      },
-      libCancle : {
-        camera: "",
-        library: "close"
-      }
-    }
   }
   isHandleEdit = (e) => {
     e.preventDefault();
-    console.log("clicked")
     this.setState({
       edit : !this.state.edit,
       innerStatus : "select"
     })
   }
   isRenderModal = () => {
-    console.log("rendal modal");
     this.setState({
       modal : !this.state.modal,
-      selectType : "default"
     })
-    
   }
   isHandleSelectType = (e) => {
   
-    let purpose = e.target.dataset.purpose;
-  
-    this.setState({
-      selectType: purpose
-    })
+    let { purpose } = e.target.dataset;
+    let targetResult = this.state[`${purpose}IsOpen`];
+    let result =  targetResult === "" ||  targetResult === "close" ? "open" : "close";
+    
+    let targetState = {
+      [`${purpose}IsOpen`]: result
+    }
+    if(result === "close") {
+      targetState[purpose] = null;
+    }
+    
+    this.handleSetState(targetState)
+    
+    this.isImportComponents(() => import(`./${purpose}`), purpose );
+  }
 
-    if(purpose === "camera") {
-      // 이때 시작을 하는 것이지...
-      import('./Camera').then(({ default: Camera }) => {
-        this.setState({
-          Camera
-        });
+  isImportComponents = (getComponents, Purpose) => {
+    getComponents().then((comp) => {
+      this.setState({
+        [Purpose] : comp.default
       });
-      return;
-    }
-    if(purpose === "library") {
-      import('./Library').then(({ default: Library }) => {
-        this.setState({
-          Library
-        });
-      });
-      return;
-    }
+    });
+    return;
   }
 
   // isHandleChange = (e) => {
@@ -118,7 +85,7 @@ class App extends Component {
   // }
 
   handleSetState = (obj) => {
-    this.setState(state => {
+    this.setState((state) => {
       return {
         ...obj
       }
@@ -126,18 +93,17 @@ class App extends Component {
   }
    render() {
     let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
-    let { camera, library } = this.selectStatus[this.state.selectType];
-    let { Camera, Library } = this.state;
+    let { Camera, Library, CameraIsOpen, LibraryIsOpen } = this.state;
     return (
       <div className="App">
         <Modal isOpen={this.state.modal}>
 
           <ChooseButton 
             buttonStyle={'select-button'}
-            handleClick={this.isHandleSelectType} innerText={'Take a photo'} purpose={'camera'}/>
+            handleClick={this.isHandleSelectType} innerText={'Take a photo'} purpose={'Camera'}/>
           <ChooseButton 
             buttonStyle={'select-button'}
-            handleClick={this.isHandleSelectType} innerText={'Choose from library'} purpose={'library'}/>
+            handleClick={this.isHandleSelectType} innerText={'Choose from library'} purpose={'Library'}/>
           <ChooseButton 
             buttonStyle={'select-button'}
             handleClick={this.isRenderModal} innerText={'Cancle'}/>
@@ -145,14 +111,13 @@ class App extends Component {
           <div className={'selected-temp'}>
             { Camera && 
               <Camera 
-                isOpen={camera}
+                isOpen={CameraIsOpen}
                 isHandleSelectType={this.isHandleSelectType}
-                canvasDisplay={this.state.canvasDisplay}
                 handleSetState={this.handleSetState}/>
             }
             { Library && 
               <Library 
-                isOpen={library}
+                isOpen={LibraryIsOpen}
                 isHandleSelectType={this.isHandleSelectType}
                 handleSetState={this.handleSetState}
               />

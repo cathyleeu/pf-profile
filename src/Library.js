@@ -13,6 +13,7 @@ class Library extends Component {
         this.inputClick = React.createRef();
         this.cropBox = React.createRef();
         this.cropButton = React.createRef();
+        
     }
     isHandleReadFile = (e) => {
         console.log("isHandleReadFile");
@@ -26,7 +27,7 @@ class Library extends Component {
         this.cropButton.current.style.marginTop = '2vmin';
         
         let _self = this;
-        let purpose = e.target.dataset.purpose || 'camera'
+        let purpose = e.target.dataset.purpose || 'Camera'
         var files = e.target.files || e.dataTransfer.files;
         
         if(!files) {
@@ -42,7 +43,7 @@ class Library extends Component {
               imagePreviewUrl : fileUrl
             }) 
     
-            if(purpose === "library") {
+            if(purpose === "Library") {
               _self.renderCropImage(e, fileUrl)
             }
           }
@@ -119,19 +120,19 @@ class Library extends Component {
     }
     render() {
         return (
-            <div className={`lib-comp ${this.props.isOpen}`}>
+            <div className={`inner-temp ${this.props.isOpen}`}>
               <input 
                 ref={this.inputClick}
                 type="file"
                 name="files[]"
                 accept=".jpg, .jpeg, .png"
-                data-purpose="library"
+                data-purpose="Lbrary"
                 onChange={this.isHandleReadFile}
                 style={{display: 'none'}}
               />
               <div 
                 className={"lib-readfile"}
-                data-purpose="library"
+                data-purpose="Library"
                 // file drop 받는 곳에서 발생하는 이벤트 
                 onDragEnter={this.isHandleDragEnter}
                 onDragOver={this.isHandleDragOver}
@@ -154,7 +155,7 @@ class Library extends Component {
                     <ChooseButton 
                         buttonStyle={'cancle-btn'}
                         handleClick={this.props.isHandleSelectType} 
-                        purpose={'libCancle'} 
+                        purpose={'Library'} 
                         innerText={'Cancle'}
                     />
                     <ChooseButton
