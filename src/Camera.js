@@ -5,11 +5,10 @@ import { ChooseButton, Startbutton } from './Components'
 let width = 320, height = 0, streaming = false;
 class Camera extends Component { 
     state = {
-        
+      canvasDisplay : "none",
     }
     constructor(props) {
         super(props)
-        console.log("from Camera Component");
         
         this.takeRef = React.createRef();
         this.renderCanvas = React.createRef();
@@ -30,29 +29,21 @@ class Camera extends Component {
                                navigator.msGetUserMedia);
     
         navigator.getMedia(
-         {
-           video: true,
-           audio: false
-         },
-         function(stream) {
-           if (navigator.mozGetUserMedia) {
-             // moz stream
-             video.mozSrcObject = stream;
-    
-           } else {
-    
-             // deprecated
-             //  var vendorURL = window.URL || window.webkitURL;
-             //  video.src = vendorURL.createObjectURL(stream);
-            
-             video.srcObject=stream;
-           }
-    
-           video.play();
-         },
-         function(err) {
-           console.log("An error occured! " + err);
-         }
+          {
+            video: true,
+            audio: false
+          },
+          function(stream) {
+            if (navigator.mozGetUserMedia) {
+              video.mozSrcObject = stream;
+            } else {
+              video.srcObject=stream;
+            }
+            video.play();
+          },
+          function(err) {
+            console.log("An error occured! " + err);
+          }
        );
     
        video.addEventListener('canplay', () => this.handleCanPlay(video), false)
@@ -87,36 +78,41 @@ class Camera extends Component {
         } else {
           console.log("handleClear"); 
         }
-    
         this.props.handleSetState({
-          imagePreviewUrl: data,
-          canvasDisplay: '',
+          imagePreviewUrl: data,          
           modal : false
+        })
+        this.setState({
+          canvasDisplay: '',
         })
         this.handleCloseCamera(video);
       }
       handleCloseCamera = (video) => {
         video = this.renderVideo.current;
         video.srcObject.getTracks().forEach(track => track.stop())
+        let _self = this;
 
         this.props.handleSetState({
-            selectType: "cameraCancle",
-            Camera : null
+            CameraIsOpen : "close"
         })
+        setTimeout(() => {
+          _self.props.handleSetState({
+            Camera : null
+        })}, 800)        
       }
       render() {
           return (
-            <div className={`photo-comp ${this.props.isOpen}`}>
+            <div className={`inner-temp ${this.props.isOpen}`}>
                 <div className={'photo-comp-top'}>
                     <video ref={this.renderVideo}>Video stream not available.</video>
-                    <canvas ref={this.renderCanvas} className="canvas" style={{display:this.props.canvasDisplay}}></canvas>
+                    <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
                 </div>
                 <div className="photo-comp-btm">
                     <ChooseButton 
                         handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
                     <Startbutton ref={this.takeRef}/>
                 </div>
-          </div>
+            </div>
           )
       }
 

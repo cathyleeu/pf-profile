@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 export const Modal = (props) => {
   let displayStyle = {
     display : props.isOpen ? "" : "none"
   }
+  // const [display, setDisplay] = useState("none")
   return (
     <div className="modal-cont" style={displayStyle}>
       <div className="modal-select-box">
@@ -12,6 +13,10 @@ export const Modal = (props) => {
     </div>
   )
 }
+
+// export function Buttons(WrappedComponent, purpose) {
+//   return ;
+// }
   
 export const ChooseButton = (props) => {
   return (

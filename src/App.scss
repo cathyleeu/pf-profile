@@ -243,8 +243,7 @@ $main-el-size: $half-size * 0.8;
       left: 4vh;
       height: calc(100% - 8vh);
 
-      .photo-comp {
-        // border: 1px solid black;
+      .inner-temp {
         background-color: #ffffff;
         position: absolute;
         top: 0vw;
@@ -252,7 +251,6 @@ $main-el-size: $half-size * 0.8;
         left: 50vw;
         height: 100%;
         z-index: 1000;
-
 
         .photo-comp-top {
           width: 40vmin;
@@ -297,15 +295,6 @@ $main-el-size: $half-size * 0.8;
             // top: -5.7vmin;
           }
         }
-      }
-      .lib-comp {
-        background-color: #ffffff;
-        position: absolute;
-        top: 0vw;
-        width: 40vw;
-        left: 50vw;
-        height: 100%;
-        z-index: 1000;
 
         .lib-readfile.drag-over {
           background-color: rgba($color: rgb(200, 197, 222), $alpha: 1);
@@ -359,13 +348,12 @@ $main-el-size: $half-size * 0.8;
         }
         
       }
-
-      .lib-comp.open,
-      .photo-comp.open {
+      
+      .inner-temp.open {
         animation: isUnfold 0.5s linear forwards;
       }
-      .lib-comp.close,
-      .photo-comp.close {
+      
+      .inner-temp.close {
         animation: isFold 0.5s linear forwards;
       }
     }
