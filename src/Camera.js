@@ -1,18 +1,23 @@
 import React, { Component } from 'react';
-import { ChooseButton, Startbutton } from './Components'
+import { ChooseButton, Startbutton, AppContext } from './Components'
 
 
 let width = 320, height = 0, streaming = false;
 class Camera extends Component { 
-    state = {
-      canvasDisplay : "none",
-    }
+    static contextType = AppContext;
+    
     constructor(props) {
         super(props)
         
         this.takeRef = React.createRef();
         this.renderCanvas = React.createRef();
         this.renderVideo = React.createRef();
+
+        this.state = {
+          canvasDisplay : "none",
+        }
+        console.log("camera component is rendering");
+        
     }
     componentDidMount() {
         this.handleStartCamera()
@@ -78,8 +83,8 @@ class Camera extends Component {
         } else {
           console.log("handleClear"); 
         }
-        this.props.handleSetState({
-          imagePreviewUrl: data,          
+        this.context.handleSetState({
+          imageUrl: data,          
           modal : false
         })
         this.setState({
@@ -91,28 +96,32 @@ class Camera extends Component {
         video = this.renderVideo.current;
         video.srcObject.getTracks().forEach(track => track.stop())
         let _self = this;
-
-        this.props.handleSetState({
-            CameraIsOpen : "close"
-        })
+        
+        this.context.toggleVisible('Camera')
         setTimeout(() => {
-          _self.props.handleSetState({
+          _self.context.handleSetState({
             Camera : null
         })}, 800)        
       }
       render() {
           return (
-            <div className={`inner-temp ${this.props.isOpen}`}>
-                <div className={'photo-comp-top'}>
-                    <video ref={this.renderVideo}>Video stream not available.</video>
-                    <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
-                </div>
-                <div className="photo-comp-btm">
-                    <ChooseButton 
-                        handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
-                    <Startbutton ref={this.takeRef}/>
-                </div>
-            </div>
+            <AppContext.Consumer>
+              {({CameraVisible}) => {
+                let display = CameraVisible ? "open" : "close";
+                return(
+                  <div className={`inner-temp ${display}`}>
+                      <div className={'photo-comp-top'}>
+                          <video ref={this.renderVideo}>Video stream not available.</video>
+                          <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
+                      </div>
+                      <div className="photo-comp-btm">
+                          <ChooseButton 
+                              handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
+                          <Startbutton ref={this.takeRef}/>
+                      </div>
+                  </div>
+              )}}
+            </AppContext.Consumer>
           )
       }
 

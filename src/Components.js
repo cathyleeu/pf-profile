@@ -1,4 +1,62 @@
 import React, { useState, useEffect } from 'react';
+// import ReactDOM from 'react-dom';
+
+// const isImportComponents = (getComponents, Purpose) => {
+  //   getComponents().then((comp) => {
+  //     this.setState({
+  //       [Purpose] : comp.default
+  //     });
+  //   });
+  //   return;
+  // }
+
+export const appState = {
+  imageUrl: "",
+  CameraVisible: false,
+  LibraryVisible : false,
+  toggleVisible: () => {},
+  handleSetState: () => {}
+}
+export const AppContext = React.createContext(appState);
+
+
+
+export function isImportComponents(getComponents) {
+  return getComponents().then(({ default: Component }) => {
+    return Component
+  });
+}
+
+// export function VisibleSplitted(props) {
+//     const [ isVisible, setIsVisible ] = useState(null);
+//     const getSelected = () => setIsVisible(props.selected)
+//     return (
+//       <React.Fragment>
+//         { isVisible && <div>{isVisible}</div> }
+//       </React.Fragment>  
+//     )    
+// }
+
+
+
+
+// export const VisibleComponent = ({ visible, getComponents, elementId, toggleVisible, purpose }) => {
+//   const [ isVisible, setIsVisible ] = useState(false);
+//   const show = () => {
+//     toggleVisible(purpose);
+//     isImportComponents(getComponents, elementId)
+//   };
+//   console.log("AAAAAA");
+  
+//   // { isVisible && content(toggleVisible)}
+//   return (
+//     <React.Fragment>
+//       {visible(show)}
+//     </React.Fragment>
+//   );
+// }
+
+
 
 export const Modal = (props) => {
   let displayStyle = {
@@ -14,9 +72,6 @@ export const Modal = (props) => {
   )
 }
 
-// export function Buttons(WrappedComponent, purpose) {
-//   return ;
-// }
   
 export const ChooseButton = (props) => {
   return (
