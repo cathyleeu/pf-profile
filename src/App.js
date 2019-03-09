@@ -1,27 +1,69 @@
 import React, { Component } from 'react';
 import './App.scss';
-import { ChooseButton, InnerCircleEl, InnerCircleText, Modal } from './Components'
+import { 
+  ChooseButton, 
+  InnerCircleEl, 
+  InnerCircleText, 
+  Modal, 
+  // VisibleComponent,
+  appState,
+  AppContext,
+  // VisibleSplitted,
+  // isImportComponents
+} from './Components'
 
 
 class App extends Component {
-  state = {
-    name : "",
-    edit : false,
-    modal: false,
-
-    file: '',
-    imagePreviewUrl: '',
-    
-    CameraIsOpen : "",
-    LibraryIsOpen: "",
-
-    innerStatus : "default",
-
-    Camera: null,
-    Library: null
-  }
   constructor() {
     super()
+    this.toggleVisible = (purpose) => {
+      console.log("CCCCC");
+      if(typeof purpose !== "string") {
+        purpose = purpose.target.dataset.purpose;
+      }
+      
+      this.setState((state) => ({
+        [`${purpose}Visible`] : !state[`${purpose}Visible`],
+        selected : purpose
+      }))
+
+      let targetResult = this.state[`${purpose}Visible`];
+      if(!targetResult) {
+        this.handleSetState({
+          [purpose] : null,
+          selected : ""
+        })
+      }
+
+      this.isImportComponents(() => import(`./${purpose}`), purpose );
+
+      // isImportComponents(() => import(`./${purpose}`), "selected")
+
+    }
+    this.handleSetState = (obj) => {
+      this.setState((state) => {
+        return {
+          ...obj
+        }
+      })
+    }
+    this.state = {
+      name : "",
+      edit : false,
+      modal: false,
+  
+      imageUrl: appState.imageUrl,
+      CameraVisible: appState.CameraVisible,
+      LibraryVisible: appState.libraryVisible,
+      toggleVisible: this.toggleVisible,
+      handleSetState: this.handleSetState,
+      selected: "", 
+
+      innerStatus : "default",
+  
+      Camera: null,
+      Library: null
+    }
     this.editStatus = {
       true : {
         slide : "edit-start",
@@ -37,6 +79,7 @@ class App extends Component {
       }
     } 
   }
+
   isHandleEdit = (e) => {
     e.preventDefault();
     this.setState({
@@ -48,23 +91,6 @@ class App extends Component {
     this.setState({
       modal : !this.state.modal,
     })
-  }
-  isHandleSelectType = (e) => {
-  
-    let { purpose } = e.target.dataset;
-    let targetResult = this.state[`${purpose}IsOpen`];
-    let result =  targetResult === "" ||  targetResult === "close" ? "open" : "close";
-    
-    let targetState = {
-      [`${purpose}IsOpen`]: result
-    }
-    if(result === "close") {
-      targetState[purpose] = null;
-    }
-    
-    this.handleSetState(targetState)
-    
-    this.isImportComponents(() => import(`./${purpose}`), purpose );
   }
 
   isImportComponents = (getComponents, Purpose) => {
@@ -84,62 +110,47 @@ class App extends Component {
   //   })
   // }
 
-  handleSetState = (obj) => {
-    this.setState((state) => {
-      return {
-        ...obj
-      }
-    })
-  }
+  
    render() {
     let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
-    let { Camera, Library, CameraIsOpen, LibraryIsOpen } = this.state;
+    let { Camera, Library } = this.state;
     return (
-      <div className="App">
-        <Modal isOpen={this.state.modal}>
+      <AppContext.Provider value={this.state}>
+        <div className="App" >
+          <Modal isOpen={this.state.modal}>
+            <ChooseButton 
+              buttonStyle={'select-button'}
+              handleClick={this.toggleVisible} innerText={'Take a photo'} purpose={'Camera'}/>
+            <ChooseButton 
+              buttonStyle={'select-button'}
+              handleClick={this.toggleVisible} innerText={'Choose from library'} purpose={'Library'}/>
+            <ChooseButton 
+              buttonStyle={'select-button'}
+              handleClick={this.isRenderModal} innerText={'Cancle'}/>
+            <div className={'selected-temp'}>
+              { Camera && <Camera /> }
+              { Library && <Library /> }
+            </div>
+            
 
-          <ChooseButton 
-            buttonStyle={'select-button'}
-            handleClick={this.isHandleSelectType} innerText={'Take a photo'} purpose={'Camera'}/>
-          <ChooseButton 
-            buttonStyle={'select-button'}
-            handleClick={this.isHandleSelectType} innerText={'Choose from library'} purpose={'Library'}/>
-          <ChooseButton 
-            buttonStyle={'select-button'}
-            handleClick={this.isRenderModal} innerText={'Cancle'}/>
-
-          <div className={'selected-temp'}>
-            { Camera && 
-              <Camera 
-                isOpen={CameraIsOpen}
-                isHandleSelectType={this.isHandleSelectType}
-                handleSetState={this.handleSetState}/>
-            }
-            { Library && 
-              <Library 
-                isOpen={LibraryIsOpen}
-                isHandleSelectType={this.isHandleSelectType}
-                handleSetState={this.handleSetState}
+          </Modal>
+          
+          <div className="edit-component">
+            <p className={`title-cont ${slide} ${fadeTitle}`}>Edit Your Profile</p>
+            <div className={`image-cont ${slide}`}>
+              <InnerCircleEl 
+                isHandleEdit={this.isHandleEdit} 
+                isRenderModal={this.isRenderModal}
+                innerStatus={this.state.innerStatus} 
               />
-            }
-          </div>
-
-        </Modal>
-        <div className="edit-component">
-          <p className={`title-cont ${slide} ${fadeTitle}`}>Edit Your Profile</p>
-          <div className={`image-cont ${slide}`}>
-            <InnerCircleEl 
-              isHandleEdit={this.isHandleEdit} 
-              isRenderModal={this.isRenderModal}
-              innerStatus={this.state.innerStatus} 
-            />
-            <InnerCircleText 
-              imageUrl={this.state.imagePreviewUrl}
-              text={innerText}
-            />
+              <InnerCircleText 
+                imageUrl={this.state.imageUrl}
+                text={innerText}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </AppContext.Provider>
     );
   }
 }
@@ -161,3 +172,5 @@ export default App;
 //                 Complete
 //               </button>
 //           </div>
+
+
