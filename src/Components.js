@@ -1,14 +1,6 @@
-import React, { useState, useEffect } from 'react';
-// import ReactDOM from 'react-dom';
+import React, { useState, useContext } from 'react';
+import ReactDOM from 'react-dom';
 
-// const isImportComponents = (getComponents, Purpose) => {
-  //   getComponents().then((comp) => {
-  //     this.setState({
-  //       [Purpose] : comp.default
-  //     });
-  //   });
-  //   return;
-  // }
 
 export const appState = {
   imageUrl: "",
@@ -19,71 +11,38 @@ export const appState = {
 }
 export const AppContext = React.createContext(appState);
 
-
-
-export function isImportComponents(getComponents) {
-  return getComponents().then(({ default: Component }) => {
-    return Component
-  });
-}
-
-// export function VisibleSplitted(props) {
-//     const [ isVisible, setIsVisible ] = useState(null);
-//     const getSelected = () => setIsVisible(props.selected)
-//     return (
-//       <React.Fragment>
-//         { isVisible && <div>{isVisible}</div> }
-//       </React.Fragment>  
-//     )    
+// TODO: splitted 따로 불러와서 렌더링 하는 부분 생각해보기! 
+// export function isImportComponents(getComponents) {
+//   return getComponents().then(({ default: Component }) => {
+//     return Component
+//   });
 // }
 
 
+export function VisibleComponent({eventComponent, targetComponent, purpose}) {
+    const [ isToggle, setIsToggle ] = useState(false);
+    const contexts = useContext(AppContext);
 
+    const handleState = (name) => {
+      contexts.handleSetState({ [name] : !contexts[name]})
+    } 
+    const eventClick = () => {
+      setIsToggle(!isToggle)
 
-// export const VisibleComponent = ({ visible, getComponents, elementId, toggleVisible, purpose }) => {
-//   const [ isVisible, setIsVisible ] = useState(false);
-//   const show = () => {
-//     toggleVisible(purpose);
-//     isImportComponents(getComponents, elementId)
-//   };
-//   console.log("AAAAAA");
-  
-//   // { isVisible && content(toggleVisible)}
-//   return (
-//     <React.Fragment>
-//       {visible(show)}
-//     </React.Fragment>
-//   );
-// }
-
-
-
-export const Modal = (props) => {
-  let displayStyle = {
-    display : props.isOpen ? "" : "none"
-  }
-  // const [display, setDisplay] = useState("none")
-  return (
-    <div className="modal-cont" style={displayStyle}>
-      <div className="modal-select-box">
-          {props.children}
-      </div> 
-    </div>
-  )
-}
-
-  
-export const ChooseButton = (props) => {
-  return (
-    <p 
-      style={props.customStyle}
-      className={props.buttonStyle}
-      onClick={(e) => props.handleClick(e)}
-      data-purpose={props.purpose}
-      >
-      {props.innerText}
-    </p>
-  )
+      if(purpose === 'modal') {
+        let innerStatus = {
+          false : () => handleState("edit"),
+          true : () => handleState("modal")
+        };
+        innerStatus[isToggle]()
+      }
+    }
+    return (
+      <React.Fragment>
+        { eventComponent(eventClick, purpose) }
+        { contexts[purpose] && targetComponent(contexts) }
+      </React.Fragment>  
+    )    
 }
 
 export const Startbutton = React.forwardRef((props, ref) => {
@@ -112,19 +71,96 @@ export const InnerCircleText = (props) => {
 }
 
 export const InnerCircleEl = (props) => {
-  let innerStatus = {
-    default : props.isHandleEdit,
-    select : props.isRenderModal,
-  }
   return (
     <div className="inner-circle-border">
       <div 
         className="inner-circle" 
-        onClick={innerStatus[props.innerStatus]}
-      >
+        onClick={props.handleClick}>
         { props.children }
       </div>
     </div>
   )
-  
 }
+
+export const modalRoot = document.getElementById('modal-root');
+
+export class Modal extends React.Component {
+  constructor(props) {
+    super(props)
+    this.el = document.createElement('div');
+    this.el.classList.add("modal-cont"); 
+  }
+  componentDidMount() {
+    modalRoot.appendChild(this.el)
+  }
+  componentWillUnmount() {
+    modalRoot.removeChild(this.el);
+  }
+  render() {
+    return ReactDOM.createPortal(
+      this.props.children,
+      this.el
+    )
+  }
+}
+
+// export const Modal = (props) => {
+//   return ReactDOM.createPortal(
+//     <div className="modal-cont">
+//       <div className="modal-select-box">
+//           {props.children}
+//       </div>
+//     </div>,
+//     modalRoot
+//   )
+// }
+
+
+
+export const ChooseButton = (props) => {
+  return (
+    <p 
+      style={props.customStyle}
+      className={props.buttonStyle}
+      onClick={(e) => props.handleClick(e)}
+      data-purpose={props.purpose}
+      >
+      {props.innerText}
+    </p>
+  )
+}
+
+export const VisibleModal = (context) => {
+  let { Camera, Library, toggleVisible, handleSetState } = context;
+  return (
+    <Modal>
+      <div className="modal-select-box">
+        <ChooseButton 
+          buttonStyle={'select-button'}
+          handleClick={toggleVisible} 
+          innerText={'Take a photo'} 
+          purpose={'Camera'}/>
+        
+        <ChooseButton 
+          buttonStyle={'select-button'}
+          handleClick={toggleVisible} 
+          innerText={'Choose from library'}
+          purpose={'Library'}/>
+
+        <ChooseButton 
+          buttonStyle={'select-button'}
+          handleClick={() => handleSetState({modal : false})}
+          purpose={'modal'}
+          innerText={'Cancle'} 
+        />      
+
+        <div className={'selected-temp'}>
+          { Camera && <Camera /> }
+          { Library && <Library /> }
+        </div>
+      </div>
+    </Modal>
+  )
+}
+
+

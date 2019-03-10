@@ -1,15 +1,12 @@
 import React, { Component } from 'react';
 import './App.scss';
 import { 
-  ChooseButton, 
   InnerCircleEl, 
   InnerCircleText, 
-  Modal, 
-  // VisibleComponent,
+  VisibleModal,
+  VisibleComponent,
   appState,
   AppContext,
-  // VisibleSplitted,
-  // isImportComponents
 } from './Components'
 
 
@@ -17,27 +14,23 @@ class App extends Component {
   constructor() {
     super()
     this.toggleVisible = (purpose) => {
-      console.log("CCCCC");
+    
       if(typeof purpose !== "string") {
         purpose = purpose.target.dataset.purpose;
       }
       
       this.setState((state) => ({
-        [`${purpose}Visible`] : !state[`${purpose}Visible`],
-        selected : purpose
+        [`${purpose}Visible`] : !state[`${purpose}Visible`]
       }))
 
       let targetResult = this.state[`${purpose}Visible`];
       if(!targetResult) {
         this.handleSetState({
-          [purpose] : null,
-          selected : ""
+          [purpose] : null
         })
       }
 
       this.isImportComponents(() => import(`./${purpose}`), purpose );
-
-      // isImportComponents(() => import(`./${purpose}`), "selected")
 
     }
     this.handleSetState = (obj) => {
@@ -53,13 +46,11 @@ class App extends Component {
       modal: false,
   
       imageUrl: appState.imageUrl,
+      // animation state : 수정 할 방법 생각해보기
       CameraVisible: appState.CameraVisible,
       LibraryVisible: appState.libraryVisible,
       toggleVisible: this.toggleVisible,
-      handleSetState: this.handleSetState,
-      selected: "", 
-
-      innerStatus : "default",
+      handleSetState: this.handleSetState, 
   
       Camera: null,
       Library: null
@@ -80,19 +71,6 @@ class App extends Component {
     } 
   }
 
-  isHandleEdit = (e) => {
-    e.preventDefault();
-    this.setState({
-      edit : !this.state.edit,
-      innerStatus : "select"
-    })
-  }
-  isRenderModal = () => {
-    this.setState({
-      modal : !this.state.modal,
-    })
-  }
-
   isImportComponents = (getComponents, Purpose) => {
     getComponents().then((comp) => {
       this.setState({
@@ -102,47 +80,24 @@ class App extends Component {
     return;
   }
 
-  // isHandleChange = (e) => {
-  //   e.preventDefault();
-  //   console.log(e.target.value);
-  //   this.setState({
-  //     [e.target.name] : e.target.value
-  //   })
-  // }
-
   
-   render() {
+  render() {
     let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
-    let { Camera, Library } = this.state;
     return (
       <AppContext.Provider value={this.state}>
         <div className="App" >
-          <Modal isOpen={this.state.modal}>
-            <ChooseButton 
-              buttonStyle={'select-button'}
-              handleClick={this.toggleVisible} innerText={'Take a photo'} purpose={'Camera'}/>
-            <ChooseButton 
-              buttonStyle={'select-button'}
-              handleClick={this.toggleVisible} innerText={'Choose from library'} purpose={'Library'}/>
-            <ChooseButton 
-              buttonStyle={'select-button'}
-              handleClick={this.isRenderModal} innerText={'Cancle'}/>
-            <div className={'selected-temp'}>
-              { Camera && <Camera /> }
-              { Library && <Library /> }
-            </div>
-            
-
-          </Modal>
-          
           <div className="edit-component">
             <p className={`title-cont ${slide} ${fadeTitle}`}>Edit Your Profile</p>
             <div className={`image-cont ${slide}`}>
-              <InnerCircleEl 
-                isHandleEdit={this.isHandleEdit} 
-                isRenderModal={this.isRenderModal}
-                innerStatus={this.state.innerStatus} 
+
+              <VisibleComponent 
+                purpose={'modal'}
+                targetComponent={(context) => <VisibleModal {...context}/>}
+                eventComponent={(handleClick) => (
+                  <InnerCircleEl handleClick={handleClick}/>
+                )}
               />
+
               <InnerCircleText 
                 imageUrl={this.state.imageUrl}
                 text={innerText}
