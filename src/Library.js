@@ -14,7 +14,11 @@ class Library extends Component {
         this.state = {
           cropDisplay: "none",
           dropDisplay: "",
-      }
+        }
+        this._isMounted = false;
+    }
+    componentDidMount() {
+      this._isMounted = true;
     }
     isHandleReadFile = (e) => {
         console.log("isHandleReadFile");
@@ -87,24 +91,29 @@ class Library extends Component {
         }
     }
     isHandleCrop = (e) => {
-        e.preventDefault();
-        let _self = this;
-        cropNode.result({
-          type: 'rawcanvas',
-          circle: true,
-          // size: { width: 300, height: 300 },
-          format: 'png'
-        }).then(function (canvas) {
+      e.preventDefault();
+      let _self = this;
+      cropNode.result({
+        type: 'rawcanvas',
+        circle: true,
+        // size: { width: 300, height: 300 },
+        format: 'png'
+      }).then(function (canvas) {
+        if(_self._isMounted) {
+
           _self.context.handleSetState({
-            imageUrl: canvas.toDataURL(),
+              imageUrl: canvas.toDataURL(),
               modal : false,
               Library: null
           })
+
           _self.setState({
               cropDisplay : 'none'
           })
+          
           cropNode.destroy();
-        })
+        }
+      })
     }
     handleInputClick = () => {
         this.inputClick.current.click()
@@ -163,6 +172,10 @@ class Library extends Component {
               )}}
             </AppContext.Consumer>
         )
+    }
+    componentWillUnmount() {
+      this._isMounted = false;
+      console.log("componentWillUnmount Library");
     }
 }
 
