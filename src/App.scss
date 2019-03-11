@@ -179,14 +179,14 @@ $main-el-size: $half-size * 0.8;
     @include transform(translateY(0));
   }
   to {
-    @include transform(translateY(-$head-font-size));
+    @include transform(translateY(-$normal-font-size));
   }
 }
 
 
 @keyframes slide-down {
   from {
-    @include transform(translateY(-$head-font-size));
+    @include transform(translateY(-$normal-font-size));
   }
   to {
     @include transform(translateY(0));

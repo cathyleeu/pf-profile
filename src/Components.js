@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import ReactDOM from 'react-dom';
 
 
@@ -20,21 +20,23 @@ export const AppContext = React.createContext(appState);
 
 
 export function VisibleComponent({eventComponent, targetComponent, purpose}) {
-    const [ isToggle, setIsToggle ] = useState(false);
     const contexts = useContext(AppContext);
-
-    const handleState = (name) => {
-      contexts.handleSetState({ [name] : !contexts[name]})
-    } 
+    // 전달되는 eventClick 이 edit status 에 따라서 변경되어야 함! 
+    // edit === default ? setState ( edit : edit )
+    // edit === edit && modal === false ? modal === true 
     const eventClick = () => {
-      setIsToggle(!isToggle)
-
-      if(purpose === 'modal') {
-        let innerStatus = {
-          false : () => handleState("edit"),
-          true : () => handleState("modal")
-        };
-        innerStatus[isToggle]()
+      switch (contexts.edit) {
+        case "default":
+          contexts.handleSetState({ edit : "edit"})
+          break;
+        case "edit":
+          contexts.handleSetState({ modal : !contexts["modal"] })
+          break;
+        case "done":
+          contexts.handleSetState({ edit : "edit", modal : !contexts["modal"] })
+          break;
+        default:
+          break;
       }
     }
     return (
@@ -104,18 +106,6 @@ export class Modal extends React.Component {
   }
 }
 
-// export const Modal = (props) => {
-//   return ReactDOM.createPortal(
-//     <div className="modal-cont">
-//       <div className="modal-select-box">
-//           {props.children}
-//       </div>
-//     </div>,
-//     modalRoot
-//   )
-// }
-
-
 
 export const ChooseButton = (props) => {
   return (
@@ -130,8 +120,7 @@ export const ChooseButton = (props) => {
   )
 }
 
-export const VisibleModal = (context) => {
-  let { Camera, Library, toggleVisible, handleSetState } = context;
+export const VisibleModal = ({ Camera, Library, toggleVisible, handleSetState }) => {
   return (
     <Modal>
       <div className="modal-select-box">

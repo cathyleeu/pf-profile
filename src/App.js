@@ -14,7 +14,7 @@ class App extends Component {
   constructor() {
     super()
     this.toggleVisible = (purpose) => {
-    
+      
       if(typeof purpose !== "string") {
         purpose = purpose.target.dataset.purpose;
       }
@@ -24,10 +24,12 @@ class App extends Component {
       }))
 
       let targetResult = this.state[`${purpose}Visible`];
-      if(!targetResult) {
+      
+      if(targetResult) {
         this.handleSetState({
           [purpose] : null
         })
+        return;
       }
 
       this.isImportComponents(() => import(`./${purpose}`), purpose );
@@ -42,7 +44,7 @@ class App extends Component {
     }
     this.state = {
       name : "",
-      edit : false,
+      edit : "default",
       modal: false,
   
       imageUrl: appState.imageUrl,
@@ -56,17 +58,25 @@ class App extends Component {
       Library: null
     }
     this.editStatus = {
-      true : {
+      default : {
+        slide: "",
+        fadeTitle: "",
+        fadeInput: "",
+        innerText : "Edit",
+        headerText : "Edit Your Profile"
+      },
+      edit : {
         slide : "edit-start",
         fadeTitle : "fade-out",
         fadeInput : "fade-in",
         innerText : "Click to take a photo",
       },
-      false : {
+      done : {
         slide : "edit-end",
         fadeTitle : "fade-in",
         fadeInput : "fade-out",
         innerText : "Edit",
+        headerText : "Your Profile"
       }
     } 
   }
@@ -82,12 +92,12 @@ class App extends Component {
 
   
   render() {
-    let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
+    let { slide, fadeTitle, innerText, headerText } = this.editStatus[this.state.edit];
     return (
       <AppContext.Provider value={this.state}>
         <div className="App" >
           <div className="edit-component">
-            <p className={`title-cont ${slide} ${fadeTitle}`}>Edit Your Profile</p>
+            <p className={`title-cont ${slide} ${fadeTitle}`}>{headerText}</p>
             <div className={`image-cont ${slide}`}>
 
               <VisibleComponent 
@@ -103,6 +113,7 @@ class App extends Component {
                 text={innerText}
               />
             </div>
+
           </div>
         </div>
       </AppContext.Provider>

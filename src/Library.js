@@ -15,10 +15,6 @@ class Library extends Component {
           cropDisplay: "none",
           dropDisplay: "",
         }
-        this._isMounted = false;
-    }
-    componentDidMount() {
-      this._isMounted = true;
     }
     isHandleReadFile = (e) => {
         console.log("isHandleReadFile");
@@ -104,13 +100,8 @@ class Library extends Component {
           _self.context.handleSetState({
               imageUrl: canvas.toDataURL(),
               modal : false,
-              Library: null
+              edit: "done"
           })
-
-          _self.setState({
-              cropDisplay : 'none'
-          })
-          
           cropNode.destroy();
         }
       })
@@ -174,7 +165,13 @@ class Library extends Component {
         )
     }
     componentWillUnmount() {
-      this._isMounted = false;
+      this.setState( state => ({
+        cropDisplay : 'none',
+      }))
+      this.context.handleSetState({
+        Library: null
+      })
+      
       console.log("componentWillUnmount Library");
     }
 }

@@ -85,7 +85,8 @@ class Camera extends Component {
         }
         this.context.handleSetState({
           imageUrl: data,          
-          modal : false
+          modal : false,
+          edit : "done"
         })
         this.setState({
           canvasDisplay: '',
