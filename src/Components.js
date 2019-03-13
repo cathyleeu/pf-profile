@@ -4,8 +4,6 @@ import ReactDOM from 'react-dom';
 
 export const appState = {
   imageUrl: "",
-  CameraVisible: false,
-  LibraryVisible : false,
   toggleVisible: () => {},
   handleSetState: () => {}
 }
@@ -21,7 +19,6 @@ export const AppContext = React.createContext(appState);
 
 export function VisibleComponent({eventComponent, targetComponent, purpose}) {
     const contexts = useContext(AppContext);
-    // 전달되는 eventClick 이 edit status 에 따라서 변경되어야 함! 
     // edit === default ? setState ( edit : edit )
     // edit === edit && modal === false ? modal === true 
     const eventClick = () => {
@@ -121,32 +118,34 @@ export const ChooseButton = (props) => {
 }
 
 export const VisibleModal = ({ Camera, Library, toggleVisible, handleSetState }) => {
+  let turn = ( Camera || Library ) ? 'open' : ''
   return (
     <Modal>
-      <div className="modal-select-box">
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={toggleVisible} 
-          innerText={'Take a photo'} 
-          purpose={'Camera'}/>
-        
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={toggleVisible} 
-          innerText={'Choose from library'}
-          purpose={'Library'}/>
+      <div className="modal_scene">
+        <div className={`modal_cube ${turn}`}>
+          <div className={`cube_face cube_face_select`}>
+            <ChooseButton 
+              handleClick={toggleVisible} 
+              innerText={'Take a photo'} 
+              purpose={'Camera'}/>
+            
+            <ChooseButton 
+              handleClick={toggleVisible} 
+              innerText={'Choose from library'}
+              purpose={'Library'}/>
 
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={() => handleSetState({modal : false})}
-          purpose={'modal'}
-          innerText={'Cancle'} 
-        />      
-
-        <div className={'selected-temp'}>
-          { Camera && <Camera /> }
-          { Library && <Library /> }
+            <ChooseButton 
+              handleClick={() => handleSetState({modal : false})}
+              purpose={'modal'}
+              innerText={'Cancle'} 
+            />      
+          </div>
+          <div className={`cube_face cube_face_temp`}>
+              { Camera && <Camera /> }
+              { Library && <Library /> }
+          </div>               
         </div>
+        
       </div>
     </Modal>
   )

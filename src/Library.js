@@ -111,57 +111,52 @@ class Library extends Component {
     }
     render() {
         return (
-          <AppContext.Consumer>
-            {({LibraryVisible})=> {
-              let display = LibraryVisible ? "open" : "close"
-              return(
-                <div className={`inner-temp ${display}`}>
-                  <input 
-                    ref={this.inputClick}
-                    type="file"
-                    name="files[]"
-                    accept=".jpg, .jpeg, .png"
-                    onChange={this.isHandleReadFile}
-                    style={{display: 'none'}}
-                  />
-                  <div 
-                    className={"lib-readfile"}
-                    data-purpose="Library"
-                    // file drop 받는 곳에서 발생하는 이벤트 
-                    onDragEnter={this.isHandleDragEnter}
-                    onDragOver={this.isHandleDragOver}
-                    onDragLeave={this.isHandleDragLeave}
-                    onDrop={this.isHandleDrop}
-                    >
-                        <ChooseButton 
-                            innerText={'Drag & Drop'}
-                            customStyle={{display: `${this.state.dropDisplay}`}}/>
-                        <ChooseButton 
-                            buttonStyle={'file-open-btn'}
-                            customStyle={{display: `${this.state.dropDisplay}`}}
-                            handleClick={this.handleInputClick} 
-                            innerText={'Click here to browse'}
-                        />
-                        <div ref={this.cropBox} style={{display: `${this.state.cropDisplay}`}}></div>
-                      
-                    </div>
-                    <div className="lib-btm" ref={this.cropButton}>
-                        <ChooseButton 
-                            buttonStyle={'cancle-btn'}
-                            handleClick={this.context.toggleVisible} 
-                            purpose={'Library'} 
-                            innerText={'Cancle'}
-                        />
-                        <ChooseButton
-                            buttonStyle={'cancle-btn'}
-                            customStyle={{display: `${this.state.cropDisplay}`}}
-                            handleClick={this.isHandleCrop} 
-                            innerText={'Crop'}
-                        />
-                    </div>
-                  </div>
-              )}}
-            </AppContext.Consumer>
+            <React.Fragment>
+                
+              <input 
+                ref={this.inputClick}
+                type="file"
+                name="files[]"
+                accept=".jpg, .jpeg, .png"
+                onChange={this.isHandleReadFile}
+                style={{display: 'none'}}
+              />
+              <div 
+                className={"lib-readfile"}
+                data-purpose="Library"
+                // file drop 받는 곳에서 발생하는 이벤트 
+                onDragEnter={this.isHandleDragEnter}
+                onDragOver={this.isHandleDragOver}
+                onDragLeave={this.isHandleDragLeave}
+                onDrop={this.isHandleDrop}
+                >
+                    <ChooseButton 
+                        innerText={'Drag & Drop'}
+                        customStyle={{display: `${this.state.dropDisplay}`}}/>
+                    <ChooseButton 
+                        buttonStyle={'file-open-btn'}
+                        customStyle={{display: `${this.state.dropDisplay}`}}
+                        handleClick={this.handleInputClick} 
+                        innerText={'Click here to browse'}
+                    />
+                    <div ref={this.cropBox} style={{display: `${this.state.cropDisplay}`}}></div>
+                  
+                </div>
+                <div className="lib-btm" ref={this.cropButton}>
+                    <ChooseButton 
+                        buttonStyle={'cancle-btn'}
+                        handleClick={this.context.toggleVisible} 
+                        purpose={'Library'} 
+                        innerText={'Cancle'}
+                    />
+                    <ChooseButton
+                        buttonStyle={'cancle-btn'}
+                        customStyle={{display: `${this.state.cropDisplay}`}}
+                        handleClick={this.isHandleCrop} 
+                        innerText={'Crop'}
+                    />
+                </div>
+            </React.Fragment>
         )
     }
     componentWillUnmount() {

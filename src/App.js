@@ -19,13 +19,7 @@ class App extends Component {
         purpose = purpose.target.dataset.purpose;
       }
       
-      this.setState((state) => ({
-        [`${purpose}Visible`] : !state[`${purpose}Visible`]
-      }))
-
-      let targetResult = this.state[`${purpose}Visible`];
-      
-      if(targetResult) {
+      if(this.state[`${purpose}`]) {
         this.handleSetState({
           [purpose] : null
         })
@@ -49,8 +43,6 @@ class App extends Component {
   
       imageUrl: appState.imageUrl,
       // animation state : 수정 할 방법 생각해보기
-      CameraVisible: appState.CameraVisible,
-      LibraryVisible: appState.libraryVisible,
       toggleVisible: this.toggleVisible,
       handleSetState: this.handleSetState, 
   

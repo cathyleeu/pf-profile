@@ -16,7 +16,6 @@ class Camera extends Component {
         this.state = {
           canvasDisplay : "none",
         }
-        console.log("camera component is rendering");
         
     }
     componentDidMount() {
@@ -73,7 +72,6 @@ class Camera extends Component {
         let context = canvas.getContext('2d'), data;
     
         if (width && height) {
-          // set width and height to canvas
           canvas.width = width;
           canvas.height = height;
           context.drawImage(video, 0, 0, width, height);
@@ -106,23 +104,17 @@ class Camera extends Component {
       }
       render() {
           return (
-            <AppContext.Consumer>
-              {({CameraVisible}) => {
-                let display = CameraVisible ? "open" : "close";
-                return(
-                  <div className={`inner-temp ${display}`}>
-                      <div className={'photo-comp-top'}>
-                          <video ref={this.renderVideo}>Video stream not available.</video>
-                          <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
-                      </div>
-                      <div className="photo-comp-btm">
-                          <ChooseButton 
-                              handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
-                          <Startbutton ref={this.takeRef}/>
-                      </div>
-                  </div>
-              )}}
-            </AppContext.Consumer>
+            <React.Fragment>
+              <div className={'photo-comp-top'}>
+                  <video ref={this.renderVideo}>Video stream not available.</video>
+                  <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
+              </div>
+              <div className="photo-comp-btm">
+                  <ChooseButton 
+                      handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
+                  <Startbutton ref={this.takeRef}/>
+              </div>
+            </React.Fragment>
           )
       }
 
