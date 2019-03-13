@@ -4,17 +4,10 @@ import ReactDOM from 'react-dom';
 
 export const appState = {
   imageUrl: "",
-  toggleVisible: () => {},
+  isImportComponents: () => {},
   handleSetState: () => {}
 }
 export const AppContext = React.createContext(appState);
-
-// TODO: splitted 따로 불러와서 렌더링 하는 부분 생각해보기! 
-// export function isImportComponents(getComponents) {
-//   return getComponents().then(({ default: Component }) => {
-//     return Component
-//   });
-// }
 
 
 export function VisibleComponent({eventComponent, targetComponent, purpose}) {
@@ -117,7 +110,7 @@ export const ChooseButton = (props) => {
   )
 }
 
-export const VisibleModal = ({ Camera, Library, toggleVisible, handleSetState }) => {
+export const VisibleModal = ({ Camera, Library, isImportComponents, handleSetState }) => {
   let turn = ( Camera || Library ) ? 'open' : ''
   return (
     <Modal>
@@ -125,12 +118,12 @@ export const VisibleModal = ({ Camera, Library, toggleVisible, handleSetState })
         <div className={`modal_cube ${turn}`}>
           <div className={`cube_face cube_face_select`}>
             <ChooseButton 
-              handleClick={toggleVisible} 
+              handleClick={isImportComponents} 
               innerText={'Take a photo'} 
               purpose={'Camera'}/>
             
             <ChooseButton 
-              handleClick={toggleVisible} 
+              handleClick={isImportComponents} 
               innerText={'Choose from library'}
               purpose={'Library'}/>
 

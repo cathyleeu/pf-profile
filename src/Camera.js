@@ -94,13 +94,7 @@ class Camera extends Component {
       handleCloseCamera = (video) => {
         video = this.renderVideo.current;
         video.srcObject.getTracks().forEach(track => track.stop())
-        let _self = this;
-        
-        this.context.toggleVisible('Camera')
-        setTimeout(() => {
-          _self.context.handleSetState({
-            Camera : null
-        })}, 800)        
+        this.context.handleSetState({ Camera : null })
       }
       render() {
           return (

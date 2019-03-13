@@ -13,21 +13,16 @@ import {
 class App extends Component {
   constructor() {
     super()
-    this.toggleVisible = (purpose) => {
-      
+    this.isImportComponents = (purpose) => {
       if(typeof purpose !== "string") {
         purpose = purpose.target.dataset.purpose;
       }
-      
-      if(this.state[`${purpose}`]) {
-        this.handleSetState({
-          [purpose] : null
-        })
-        return;
-      }
-
-      this.isImportComponents(() => import(`./${purpose}`), purpose );
-
+      import(`./${purpose}`).then((comp) => {
+        this.setState({
+          [purpose] : comp.default
+        });
+      });
+      return;
     }
     this.handleSetState = (obj) => {
       this.setState((state) => {
@@ -43,7 +38,7 @@ class App extends Component {
   
       imageUrl: appState.imageUrl,
       // animation state : 수정 할 방법 생각해보기
-      toggleVisible: this.toggleVisible,
+      isImportComponents : this.isImportComponents,
       handleSetState: this.handleSetState, 
   
       Camera: null,
@@ -71,15 +66,6 @@ class App extends Component {
         headerText : "Your Profile"
       }
     } 
-  }
-
-  isImportComponents = (getComponents, Purpose) => {
-    getComponents().then((comp) => {
-      this.setState({
-        [Purpose] : comp.default
-      });
-    });
-    return;
   }
 
   

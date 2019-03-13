@@ -145,7 +145,7 @@ class Library extends Component {
                 <div className="lib-btm" ref={this.cropButton}>
                     <ChooseButton 
                         buttonStyle={'cancle-btn'}
-                        handleClick={this.context.toggleVisible} 
+                        handleClick={() => this.context.handleSetState({Library: null})} 
                         purpose={'Library'} 
                         innerText={'Cancle'}
                     />
