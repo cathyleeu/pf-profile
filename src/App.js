@@ -13,25 +13,16 @@ import {
 class App extends Component {
   constructor() {
     super()
-    this.toggleVisible = (purpose) => {
-    
+    this.isImportComponents = (purpose) => {
       if(typeof purpose !== "string") {
         purpose = purpose.target.dataset.purpose;
       }
-      
-      this.setState((state) => ({
-        [`${purpose}Visible`] : !state[`${purpose}Visible`]
-      }))
-
-      let targetResult = this.state[`${purpose}Visible`];
-      if(!targetResult) {
-        this.handleSetState({
-          [purpose] : null
-        })
-      }
-
-      this.isImportComponents(() => import(`./${purpose}`), purpose );
-
+      import(`./${purpose}`).then((comp) => {
+        this.setState({
+          [purpose] : comp.default
+        });
+      });
+      return;
     }
     this.handleSetState = (obj) => {
       this.setState((state) => {
@@ -42,52 +33,49 @@ class App extends Component {
     }
     this.state = {
       name : "",
-      edit : false,
+      edit : "default",
       modal: false,
   
       imageUrl: appState.imageUrl,
       // animation state : 수정 할 방법 생각해보기
-      CameraVisible: appState.CameraVisible,
-      LibraryVisible: appState.libraryVisible,
-      toggleVisible: this.toggleVisible,
+      isImportComponents : this.isImportComponents,
       handleSetState: this.handleSetState, 
   
       Camera: null,
       Library: null
     }
     this.editStatus = {
-      true : {
+      default : {
+        slide: "",
+        fadeTitle: "",
+        fadeInput: "",
+        innerText : "Edit",
+        headerText : "Edit Your Profile"
+      },
+      edit : {
         slide : "edit-start",
         fadeTitle : "fade-out",
         fadeInput : "fade-in",
         innerText : "Click to take a photo",
       },
-      false : {
+      done : {
         slide : "edit-end",
         fadeTitle : "fade-in",
         fadeInput : "fade-out",
         innerText : "Edit",
+        headerText : "Your Profile"
       }
     } 
   }
 
-  isImportComponents = (getComponents, Purpose) => {
-    getComponents().then((comp) => {
-      this.setState({
-        [Purpose] : comp.default
-      });
-    });
-    return;
-  }
-
   
   render() {
-    let { slide, fadeTitle, innerText } = this.editStatus[this.state.edit];
+    let { slide, fadeTitle, innerText, headerText } = this.editStatus[this.state.edit];
     return (
       <AppContext.Provider value={this.state}>
         <div className="App" >
           <div className="edit-component">
-            <p className={`title-cont ${slide} ${fadeTitle}`}>Edit Your Profile</p>
+            <p className={`title-cont ${slide} ${fadeTitle}`}>{headerText}</p>
             <div className={`image-cont ${slide}`}>
 
               <VisibleComponent 
@@ -103,6 +91,7 @@ class App extends Component {
                 text={innerText}
               />
             </div>
+
           </div>
         </div>
       </AppContext.Provider>

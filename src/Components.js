@@ -1,40 +1,32 @@
-import React, { useState, useContext } from 'react';
+import React, { useContext } from 'react';
 import ReactDOM from 'react-dom';
 
 
 export const appState = {
   imageUrl: "",
-  CameraVisible: false,
-  LibraryVisible : false,
-  toggleVisible: () => {},
+  isImportComponents: () => {},
   handleSetState: () => {}
 }
 export const AppContext = React.createContext(appState);
 
-// TODO: splitted 따로 불러와서 렌더링 하는 부분 생각해보기! 
-// export function isImportComponents(getComponents) {
-//   return getComponents().then(({ default: Component }) => {
-//     return Component
-//   });
-// }
-
 
 export function VisibleComponent({eventComponent, targetComponent, purpose}) {
-    const [ isToggle, setIsToggle ] = useState(false);
     const contexts = useContext(AppContext);
-
-    const handleState = (name) => {
-      contexts.handleSetState({ [name] : !contexts[name]})
-    } 
+    // edit === default ? setState ( edit : edit )
+    // edit === edit && modal === false ? modal === true 
     const eventClick = () => {
-      setIsToggle(!isToggle)
-
-      if(purpose === 'modal') {
-        let innerStatus = {
-          false : () => handleState("edit"),
-          true : () => handleState("modal")
-        };
-        innerStatus[isToggle]()
+      switch (contexts.edit) {
+        case "default":
+          contexts.handleSetState({ edit : "edit"})
+          break;
+        case "edit":
+          contexts.handleSetState({ modal : !contexts["modal"] })
+          break;
+        case "done":
+          contexts.handleSetState({ edit : "edit", modal : !contexts["modal"] })
+          break;
+        default:
+          break;
       }
     }
     return (
@@ -104,18 +96,6 @@ export class Modal extends React.Component {
   }
 }
 
-// export const Modal = (props) => {
-//   return ReactDOM.createPortal(
-//     <div className="modal-cont">
-//       <div className="modal-select-box">
-//           {props.children}
-//       </div>
-//     </div>,
-//     modalRoot
-//   )
-// }
-
-
 
 export const ChooseButton = (props) => {
   return (
@@ -130,34 +110,35 @@ export const ChooseButton = (props) => {
   )
 }
 
-export const VisibleModal = (context) => {
-  let { Camera, Library, toggleVisible, handleSetState } = context;
+export const VisibleModal = ({ Camera, Library, isImportComponents, handleSetState }) => {
+  let turn = ( Camera || Library ) ? 'open' : ''
   return (
     <Modal>
-      <div className="modal-select-box">
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={toggleVisible} 
-          innerText={'Take a photo'} 
-          purpose={'Camera'}/>
-        
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={toggleVisible} 
-          innerText={'Choose from library'}
-          purpose={'Library'}/>
+      <div className="modal_scene">
+        <div className={`modal_cube ${turn}`}>
+          <div className={`cube_face cube_face_select`}>
+            <ChooseButton 
+              handleClick={isImportComponents} 
+              innerText={'Take a photo'} 
+              purpose={'Camera'}/>
+            
+            <ChooseButton 
+              handleClick={isImportComponents} 
+              innerText={'Choose from library'}
+              purpose={'Library'}/>
 
-        <ChooseButton 
-          buttonStyle={'select-button'}
-          handleClick={() => handleSetState({modal : false})}
-          purpose={'modal'}
-          innerText={'Cancle'} 
-        />      
-
-        <div className={'selected-temp'}>
-          { Camera && <Camera /> }
-          { Library && <Library /> }
+            <ChooseButton 
+              handleClick={() => handleSetState({modal : false})}
+              purpose={'modal'}
+              innerText={'Cancle'} 
+            />      
+          </div>
+          <div className={`cube_face cube_face_temp`}>
+              { Camera && <Camera /> }
+              { Library && <Library /> }
+          </div>               
         </div>
+        
       </div>
     </Modal>
   )
