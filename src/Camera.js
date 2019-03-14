@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { ChooseButton, Startbutton, AppContext } from './Components'
+import { ChooseButton, AppContext } from './Components'
 
 
 let width = 320, height = 0, streaming = false;
@@ -13,9 +13,9 @@ class Camera extends Component {
         this.renderCanvas = React.createRef();
         this.renderVideo = React.createRef();
 
-        this.state = {
-          canvasDisplay : "none",
-        }
+        // this.state = {
+        //   canvasDisplay : "none",
+        // }
         
     }
     componentDidMount() {
@@ -86,13 +86,12 @@ class Camera extends Component {
           modal : false,
           edit : "done"
         })
-        this.setState({
-          canvasDisplay: '',
-        })
         this.handleCloseCamera(video);
       }
       handleCloseCamera = (video) => {
-        video = this.renderVideo.current;
+        if(!video){
+          video = this.renderVideo.current;
+        }
         video.srcObject.getTracks().forEach(track => track.stop())
         this.context.handleSetState({ Camera : null })
       }
@@ -101,17 +100,21 @@ class Camera extends Component {
             <React.Fragment>
               <div className={'photo-comp-top'}>
                   <video ref={this.renderVideo}>Video stream not available.</video>
-                  <canvas ref={this.renderCanvas} className="canvas" style={{display:this.state.canvasDisplay}}></canvas>
+                  <canvas ref={this.renderCanvas} className="canvas" style={{display: 'none'}}></canvas>
               </div>
               <div className="photo-comp-btm">
                   <ChooseButton 
                       handleClick={this.handleCloseCamera} innerText={'Cancle'}/>
-                  <Startbutton ref={this.takeRef}/>
+                  <div ref={this.takeRef}></div>
               </div>
             </React.Fragment>
           )
       }
-
+      // componentWillUnmount() {
+      //   // this.setState({
+      //   //   canvasDisplay: "none"
+      //   // })
+      // }
 }
 
 export default Camera;

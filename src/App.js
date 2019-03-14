@@ -7,6 +7,8 @@ import {
   VisibleComponent,
   appState,
   AppContext,
+  ChooseButton,
+  AppInput
 } from './Components'
 
 
@@ -32,11 +34,12 @@ class App extends Component {
       })
     }
     this.state = {
-      name : "",
+      name: "",
+      imageUrl: appState.imageUrl,
+
       edit : "default",
       modal: false,
-  
-      imageUrl: appState.imageUrl,
+      
       // animation state : 수정 할 방법 생각해보기
       isImportComponents : this.isImportComponents,
       handleSetState: this.handleSetState, 
@@ -67,10 +70,19 @@ class App extends Component {
       }
     } 
   }
+  handleInitState = () => {
+    this.setState((state) => ({
+      ...state,
+      name: "",
+      imageUrl: "",
 
+      edit : "default",
+      modal: false
+    }))
+  }
   
   render() {
-    let { slide, fadeTitle, innerText, headerText } = this.editStatus[this.state.edit];
+    let { slide, fadeTitle, innerText, headerText, fadeInput } = this.editStatus[this.state.edit];
     return (
       <AppContext.Provider value={this.state}>
         <div className="App" >
@@ -86,12 +98,30 @@ class App extends Component {
                 )}
               />
 
-              <InnerCircleText 
+              <InnerCircleText
                 imageUrl={this.state.imageUrl}
                 text={innerText}
               />
             </div>
-
+            <div 
+              style={{display: `${this.state.edit === "edit" ? "" : "none"}`}}
+              className={`input-cont ${slide} ${fadeInput}`}>
+              <AppInput 
+                type="text"
+                purpose={"name"}
+                placeholder="Write Your Name"
+              />
+            </div>
+            <div style={{display: `${this.state.edit === "edit" ? "" : "none"}`}}>
+              <ChooseButton
+                // store current state 
+                handleClick={() => this.handleSetState({edit : "default"})} 
+                innerText={'Complete'} />
+              <ChooseButton 
+                // reset to be initial state 
+                handleClick={this.handleInitState}
+                innerText={'Cancle'} />
+            </div>
           </div>
         </div>
       </AppContext.Provider>
@@ -102,19 +132,7 @@ class App extends Component {
 export default App;
 
 
-// <div 
-//             className={`input-cont ${slide} ${fadeInput}`}>
-//             <p>name</p>
-//             <input 
-//               type="text" 
-//               name="name"
-//               placeholder="Write Your Name"
-//               onChange={this.isHandleChange}
-//               value={this.state.name}
-//               />
-//               <button>
-//                 Complete
-//               </button>
-//           </div>
+
+          
 
 
