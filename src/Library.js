@@ -95,15 +95,12 @@ class Library extends Component {
         // size: { width: 300, height: 300 },
         format: 'png'
       }).then(function (canvas) {
-        if(_self._isMounted) {
-
-          _self.context.handleSetState({
-              imageUrl: canvas.toDataURL(),
-              modal : false,
-              edit: "done"
-          })
-          cropNode.destroy();
-        }
+        _self.context.handleSetState({
+            imageUrl: canvas.toDataURL(),
+            modal : false,
+            edit: "done"
+        })
+        cropNode.destroy();
       })
     }
     handleInputClick = () => {
